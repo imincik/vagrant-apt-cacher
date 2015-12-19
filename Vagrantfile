@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 
 
-Vagrant.require_version ">= 1.7.0"
+Vagrant.require_version ">= 1.7.4"
 BOX = "wily-canonical"
 BOX_URL = "http://cloud-images.ubuntu.com/vagrant/wily/current/wily-server-cloudimg-amd64-vagrant-disk1.box"
 
