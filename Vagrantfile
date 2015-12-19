@@ -1,32 +1,26 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# Set VAGRANT_SERVER_IP variable before running any Vagrant command
 
-# To add additional ip address run following command in shell:
-# $ ip addr add <IP address>/24 dev eth1
-
-
-if ENV["VAGRANT_SERVER_IP"].nil?
-  raise "Set VAGRANT_SERVER_IP environment variable before running any Vagrant command !"
-end
+Vagrant.require_version ">= 1.7.0"
+BOX = "wily-canonical"
+BOX_URL = "http://cloud-images.ubuntu.com/vagrant/wily/current/wily-server-cloudimg-amd64-vagrant-disk1.box"
 
 Vagrant.configure(2) do |config|
-  config.vm.box = "precise-canonical"
-
-  config.vm.network "public_network", ip: ENV["VAGRANT_SERVER_IP"]
+  config.vm.box = BOX
+  config.vm.box_url = BOX_URL
 
   config.vm.provider "virtualbox" do |v|
+    v.customize ["modifyvm", :id, "--memory", "512"]
     v.customize ["modifyvm", :id, "--nictype1", "virtio"]
-    v.customize ["modifyvm", :id, "--nictype2", "virtio"]
-    # v.customize ["modifyvm", :id, "--memory", "1024"]
-    # v.gui = true
+
+    config.vm.network "forwarded_port",
+        guest: 3142,
+        host: 3142,
+        auto_correct: true
+    #v.gui = true
   end
 
   config.vm.hostname = "apt-cacher"
-  config.vm.provision "shell",
-    inline: "
-      apt-get install apt-cacher-ng \
-      && service apt-cacher-ng restart
-    "
+  config.vm.provision "shell", inline: "apt-get install apt-cacher-ng"
 end
